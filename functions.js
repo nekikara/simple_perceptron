@@ -1,6 +1,7 @@
 "use strict";
 
 // NumPyのnp.c_[]メソッドを実装する
+// ブログで掲載
 function c_() {
     var dimension = arguments[0].size().length,
         n = arguments.length;
@@ -36,6 +37,7 @@ function c_() {
 }
 
 // ランダムな行列を返す
+// ブログで掲載
 function generate_random_matrix(size) {
     // sizeをArrayにしておく
     if (typeof size == "number") {
@@ -55,5 +57,47 @@ function generate_random_matrix(size) {
             matrix.push(generate_random_matrix(use_size));
         }
         return math.matrix(matrix);
+    }
+}
+
+// np.vstack
+function vstack(array) {
+    console.log("call vstack");
+    var stack = array.shift();
+    if (stack instanceof Array) {
+        stack = math.matrix([ stack ]);
+    } else {
+        var dimension = stack.size().length;
+        if (dimension == 1) {
+            stack.resize([1, dimension[0]]);
+        }
+    }
+    for(var i in array) {
+        stack["_data"].push(array[i]);
+    }
+    return stack;
+}
+
+// ここからは行列操作ではなく
+// 機械学習の部分
+
+// 識別関数の本体
+function predict(wvec, xvec) {
+    var out = math.multiply(wvec, xvec);
+    if (out >= 0) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
+// 学習部
+function train(wvec, xvec, label) {
+    var y = predict(wvec, xvec);
+    var c = 0.5;
+    if (y * label < 0) {
+        return math.add(wvec, math.multiply(math.multiply(c, label), xvec));
+    } else {
+        return wvec;
     }
 }
